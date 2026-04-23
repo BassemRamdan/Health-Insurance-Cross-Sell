@@ -16,6 +16,9 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 try:
+    import importlib
+    import ml_model.predict
+    importlib.reload(ml_model.predict)
     from ml_model.predict import predict_pipeline
     from utils.data_processing import encode_and_scale
     from sklearn.decomposition import PCA
