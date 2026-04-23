@@ -605,5 +605,4 @@ elif page == "Genetic Algorithm":
     with c2:
         st.markdown('**Discarded Features (Chromosome bits = 0)**')
         st.code("['Gender', 'Region_Code', 'Vintage']")
-   
- 
+ 
