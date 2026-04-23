@@ -382,49 +382,44 @@ elif page == "Customer Segmentation":
                 
                 with r1:
                     st.markdown(f"""
-                        <div class="content-card">
-                            <p class="section-title">K-Medoid Model</p>
-                            <p class="section-sub">Robust partitioning using actual data medoids</p>
-                            <div style="display:flex;align-items:center;gap:12px;margin:15px 0;">
-                                <span style="font-size:32px;font-weight:700;color:{D_BLUE};">Segment {kmid}</span>
+                        <div class="content-card" style="text-align:center;">
+                            <p class="section-title">K-Medoids</p>
+                            <div style="margin:15px 0;">
+                                <span style="font-size:36px;font-weight:700;color:{D_BLUE};">Segment {kmid}</span>
                             </div>
-                            <p style="font-size:16px;color:{MAIN_TEXT};font-weight:600;">Prediction: {kmedoid_names.get(kmid, 'UNKNOWN')}</p>
+                            <p style="font-size:18px;color:{MAIN_TEXT};font-weight:600;">{kmedoid_names.get(kmid, 'UNKNOWN')}</p>
                         </div>
                     """, unsafe_allow_html=True)
 
                 with r2:
                     st.markdown(f"""
-                        <div class="content-card">
-                            <p class="section-title">Hierarchical Model (Agglomerative)</p>
-                            <p class="section-sub">Assigned via Nearest Ward Centroid distance</p>
-                            <div style="display:flex;align-items:center;gap:12px;margin:15px 0;">
-                                <span style="font-size:32px;font-weight:700;color:{D_PURPLE};">Segment {hier}</span>
+                        <div class="content-card" style="text-align:center;">
+                            <p class="section-title">Hierarchical</p>
+                            <div style="margin:15px 0;">
+                                <span style="font-size:36px;font-weight:700;color:{D_PURPLE};">Segment {hier}</span>
                             </div>
-                            <p style="font-size:16px;color:{MAIN_TEXT};font-weight:600;">Success</p>
+                            <p style="font-size:18px;color:{MAIN_TEXT};font-weight:600;">Success</p>
                         </div>
                     """, unsafe_allow_html=True)
 
                 with r3:
                     action_color = D_GREEN if f_action == "IGNORE" else (D_ORANGE if f_action == "MONITOR" else "#f43f5e")
                     st.markdown(f"""
-                        <div class="content-card">
-                            <p class="section-title">Fuzzy Logic Engine</p>
-                            <p class="section-sub">9-Rule Inference based on Age and K-Medoid Class</p>
-                            <div style="display:flex;align-items:center;gap:12px;margin:15px 0;">
-                                <span style="font-size:32px;font-weight:700;color:{action_color};">{f_score:.1f} / 10</span>
+                        <div class="content-card" style="text-align:center;">
+                            <p class="section-title">Fuzzy Logic</p>
+                            <div style="margin:15px 0;">
+                                <span style="font-size:36px;font-weight:700;color:{action_color};">{f_score:.1f} / 10</span>
                             </div>
-                            <p style="font-size:16px;color:{MAIN_TEXT};font-weight:600;">Action: {f_action}</p>
+                            <p style="font-size:18px;color:{MAIN_TEXT};font-weight:600;">{f_action}</p>
                         </div>
                     """, unsafe_allow_html=True)
 
                 # Genetic Algorithm Highlight
                 st.markdown(f"""
-                    <div style="background-color:rgba(59,130,246,0.1); border-left:4px solid {D_BLUE}; padding:15px; border-radius:6px; margin-top:10px;">
-                        <h4 style="margin:0 0 5px; color:{D_BLUE}; font-size:16px;">🧬 Genetic Algorithm Optimization Priority</h4>
-                        <p style="margin:0; font-size:14px; color:{MAIN_TEXT};">
-                            Our Evolutionary Algorithm determined that the most critical features driving this specific prediction are 
-                            <b>Vehicle Damage</b> (<code>{vehicle_damage}</code>) and <b>Age</b> (<code>{age}</code>). 
-                            Other inputs like <i>Gender</i> or <i>Region Code</i> were mathematically ignored to maximize prediction accuracy!
+                    <div style="background-color:rgba(59,130,246,0.1); border-left:4px solid {D_BLUE}; padding:15px; border-radius:6px; margin-top:10px; display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:20px;">🧬</span>
+                        <p style="margin:0; font-size:15px; color:{MAIN_TEXT}; font-weight:600;">
+                            Genetic Algorithm Features: <span style="color:{D_BLUE};">Vehicle Damage</span> & <span style="color:{D_BLUE};">Age</span>
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
