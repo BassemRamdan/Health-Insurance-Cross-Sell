@@ -1,0 +1,139 @@
+import json
+
+notebook_path = r'C:\ANU\DataMining\InsureDx\notebooks\Fuzzy Logic.ipynb'
+
+nb = {
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "# Fuzzy Logic & K-Medoids Integration\n",
+                "\n",
+                "In this notebook, we demonstrate how our Fuzzy Logic system is explicitly tied to our K-Medoids clustering output. As requested by the TA, we use the Fuzzy system as an Expert Decision System.\n",
+                "\n",
+                "**Inputs:**\n",
+                "1. `Age`\n",
+                "2. `K-Medoids Cluster Label` (0 = Hot Leads, 1 = Warm Leads, 2 = Cold Leads)\n",
+                "\n",
+                "**Output:**\n",
+                "`Action Score` (Used to decide if we TARGET, MONITOR, or IGNORE the lead)."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "import numpy as np\n",
+                "import skfuzzy as fuzz\n",
+                "from skfuzzy import control as ctrl\n",
+                "\n",
+                "# 1. Define Antecedents (Inputs) and Consequent (Output)\n",
+                "age_var = ctrl.Antecedent(np.arange(20, 85, 1), 'age')\n",
+                "cluster_var = ctrl.Antecedent(np.arange(0, 3, 1), 'cluster_label')\n",
+                "action_score = ctrl.Consequent(np.arange(0, 11, 1), 'action_score')\n"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## Define Membership Functions (Ranges)"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# Age ranges\n",
+                "age_var['young'] = fuzz.trimf(age_var.universe, [20, 20, 35])\n",
+                "age_var['middle'] = fuzz.trimf(age_var.universe, [30, 45, 60])\n",
+                "age_var['senior'] = fuzz.trimf(age_var.universe, [55, 85, 85])\n",
+                "\n",
+                "# K-Medoids Cluster outputs\n",
+                "cluster_var['hot_lead'] = fuzz.trimf(cluster_var.universe, [0, 0, 1])\n",
+                "cluster_var['warm_lead'] = fuzz.trimf(cluster_var.universe, [0, 1, 2])\n",
+                "cluster_var['cold_lead'] = fuzz.trimf(cluster_var.universe, [1, 2, 2])\n",
+                "\n",
+                "# Output Decision Action Ranges\n",
+                "action_score.automf(names=['ignore', 'monitor', 'target'])\n"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## Define Expert Rules (Integrating K-Medoids)"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "rules = [\n",
+                "    ctrl.Rule(age_var['young'] & cluster_var['cold_lead'], action_score['ignore']),\n",
+                "    ctrl.Rule(age_var['middle'] & cluster_var['hot_lead'], action_score['target']),\n",
+                "    ctrl.Rule(age_var['senior'] & cluster_var['hot_lead'], action_score['monitor']),\n",
+                "    ctrl.Rule(cluster_var['cold_lead'], action_score['ignore']),\n",
+                "    ctrl.Rule(cluster_var['warm_lead'], action_score['monitor'])\n",
+                "]\n",
+                "\n",
+                "fuzzy_ctrl = ctrl.ControlSystem(rules)\n",
+                "fuzzy_sim = ctrl.ControlSystemSimulation(fuzzy_ctrl)\n"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## Test the System (Simulating K-Medoids Pipeline output)"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# Example: A customer who is 45 years old and was assigned to Cluster 0 (Hot Lead) by K-Medoids.\n",
+                "fuzzy_sim.input['age'] = 45\n",
+                "fuzzy_sim.input['cluster_label'] = 0  # <--- Linked exactly to K-Medoids Output!\n",
+                "\n",
+                "fuzzy_sim.compute()\n",
+                "score = round(fuzzy_sim.output['action_score'], 1)\n",
+                "\n",
+                "print(f\"Fuzzy Output Score: {score} / 10\")\n",
+                "\n",
+                "if score >= 6.5:\n",
+                "    print(\"Final Business Decision: TARGET (Shortlisted)\")\n",
+                "elif score >= 4.0:\n",
+                "    print(\"Final Business Decision: MONITOR (Waitlisted)\")\n",
+                "else:\n",
+                "    print(\"Final Business Decision: IGNORE (Rejected)\")\n"
+            ]
+        }
+    ],
+    "metadata": {
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "name": "python"
+        }
+    },
+    "nbformat": 4,
+    "nbformat_minor": 4
+}
+
+with open(notebook_path, 'w', encoding='utf-8') as f:
+    json.dump(nb, f, indent=1)
+
+print('Standalone Fuzzy notebook updated!')
