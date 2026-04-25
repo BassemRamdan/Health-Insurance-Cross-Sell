@@ -599,8 +599,8 @@ elif page == "Genetic Algorithm":
     c1, c2 = st.columns(2)
     with c1:
         st.markdown('**Selected Elite Features (Chromosome bits = 1)**')
-        st.code("['Age', 'Vehicle_Damage', 'Previously_Insured', 'Annual_Premium', 'Policy_Sales_Channel']")
+        st.code("['Driving_License', 'Previously_Insured', 'Vehicle_Damage']")
     with c2:
         st.markdown('**Discarded Features (Chromosome bits = 0)**')
-        st.code("['Gender', 'Region_Code', 'Vintage']")
+        st.code("['Gender', 'Age', 'Region_Code', 'Vehicle_Age', 'Annual_Premium', 'Policy_Sales_Channel', 'Vintage']")
  
