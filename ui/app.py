@@ -494,16 +494,19 @@ elif page == "Clustering Analysis":
         if 'Response' in X_processed.columns:
             X_processed = X_processed.drop('Response', axis=1)
             
+        best_features = joblib.load(artifacts_dir / 'ga_features.joblib')
+        X_ga = X_processed[best_features].values
+            
         # KMedoid Prediction
-        kmed_labels = kmedoids_model.predict(X_processed.values)
+        kmed_labels = kmedoids_model.predict(X_ga)
         
         # Hierarchical Prediction
-        distances = pairwise_distances(X_processed.values, hier_centroids)
+        distances = pairwise_distances(X_ga, hier_centroids)
         hier_labels = np.argmin(distances, axis=1)
         
         # PCA Reduction
         pca = PCA(n_components=2, random_state=42)
-        pcs = pca.fit_transform(X_processed.values)
+        pcs = pca.fit_transform(X_ga)
         
         X_processed['PC1'] = pcs[:, 0]
         X_processed['PC2'] = pcs[:, 1]
