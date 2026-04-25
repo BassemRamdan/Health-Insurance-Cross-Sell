@@ -18,7 +18,9 @@ if str(ROOT_DIR) not in sys.path:
 try:
     import importlib
     import ml_model.predict
+    import utils.data_processing
     importlib.reload(ml_model.predict)
+    importlib.reload(utils.data_processing)
     from ml_model.predict import predict_pipeline
     from utils.data_processing import encode_and_scale
     from sklearn.decomposition import PCA
