@@ -56,16 +56,26 @@ def encode_and_scale(df, is_training=True, artifacts_dir='artifacts'):
         le_damage = joblib.load(os.path.join(artifacts_dir, 'le_damage.joblib'))
         df_processed['Vehicle_Damage'] = le_damage.transform(df_processed['Vehicle_Damage'])
 
-    cols_to_scale = ['Age', 'Annual_Premium', 'Vintage', 'Policy_Sales_Channel', 'Region_Code']
-    cols_to_scale = [c for c in cols_to_scale if c in df_processed.columns]
+    # Get the correct column order expected by the scaler
+    raw_cols_path = os.path.join(artifacts_dir, 'raw_columns.joblib')
+    if os.path.exists(raw_cols_path):
+        cols_to_scale = joblib.load(raw_cols_path)
+        # Ensure we only scale columns that actually exist in the df (in case Response is in raw_cols but not df)
+        cols_to_scale = [c for c in cols_to_scale if c in df_processed.columns]
+    else:
+        cols_to_scale = [c for c in df_processed.columns if c != 'Response']
     
     if len(cols_to_scale) > 0:
         if is_training:
             scaler = StandardScaler()
             df_processed[cols_to_scale] = scaler.fit_transform(df_processed[cols_to_scale])
             joblib.dump(scaler, os.path.join(artifacts_dir, 'scaler.joblib'))
+            joblib.dump(cols_to_scale, os.path.join(artifacts_dir, 'raw_columns.joblib'))
         else:
             scaler = joblib.load(os.path.join(artifacts_dir, 'scaler.joblib'))
-            df_processed[cols_to_scale] = scaler.transform(df_processed[cols_to_scale])
+            # Reorder df to match scaler training exactly
+            df_processed = df_processed[cols_to_scale]
+            scaled_vals = scaler.transform(df_processed)
+            df_processed = pd.DataFrame(scaled_vals, columns=cols_to_scale, index=df_processed.index)
         
     return df_processed
