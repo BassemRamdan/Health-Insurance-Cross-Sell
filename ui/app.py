@@ -182,10 +182,10 @@ st.markdown(
 # ── Helper Functions ───────────────────────────────────────────────────────────
 
 @st.cache_data
-def load_data(limit=10000):
+def load_data():
     raw_path = ROOT_DIR / "data" / "raw_data.csv"
     if raw_path.exists():
-        df = pd.read_csv(raw_path, nrows=limit)
+        df = pd.read_csv(raw_path)
         return df
     return pd.DataFrame()
 
@@ -258,7 +258,7 @@ def page_header(title: str, subtitle: str) -> None:
 
 if page == "Dashboard":
     page_header("Analytics Dashboard", "System Overview & Key Performance Indicators")
-    df = load_data(limit=50000)
+    df = load_data()
     
     if df.empty:
         st.warning("Data not found. Please ensure data/raw_data.csv exists.")
@@ -323,12 +323,12 @@ if page == "Dashboard":
                 st.plotly_chart(chart_layout(fig_prev, height=300), use_container_width=True)
                 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown('<p class="section-title">Age vs Annual Premium (Sampled)</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">Age vs Annual Premium (Full Dataset)</p>', unsafe_allow_html=True)
         if 'Age' in df.columns and 'Annual_Premium' in df.columns and 'Response' in df.columns:
-            scatter_df = df.sample(min(2000, len(df))) # Sample for scatter plot performance
-            scatter_df["Response_Label"] = scatter_df['Response'].map({0: "Not Interested", 1: "Interested"})
+            df_plot = df.copy()
+            df_plot["Response_Label"] = df_plot['Response'].map({0: "Not Interested", 1: "Interested"})
             fig_scatter = px.scatter(
-                scatter_df, x="Age", y="Annual_Premium", color="Response_Label",
+                df_plot, x="Age", y="Annual_Premium", color="Response_Label",
                 color_discrete_map={"Interested": D_BLUE, "Not Interested": "#f43f5e"},
                 opacity=0.6
             )
@@ -434,7 +434,7 @@ elif page == "Customer Segmentation":
 
 elif page == "Data Analysis":
     page_header("Data Exploration", "In-depth visual analysis for feature correlations and distributions")
-    df = load_data(limit=10000)
+    df = load_data()
     
     if df.empty:
         st.warning("Data not found.")
@@ -481,9 +481,9 @@ elif page == "Clustering Analysis":
         kmedoids_model = joblib.load(artifacts_dir / 'kmedoids_model.joblib')
         hier_centroids = joblib.load(artifacts_dir / 'hierarchical_centroids.joblib')
         
-        # Load a sample for visualization to prevent UI lag (500 pts approx)
-        df_sample = load_data(limit=800)
-        st.info("Visualizations are based on a randomly sampled subset of 800 inputs to preserve browser memory.")
+        # Load entire dataset for clustering visualization
+        df_sample = load_data()
+        st.info("Visualizations are rendering the entire dataset of 381k+ rows. This may take a moment to load in the browser.")
         
         if 'id' in df_sample.columns:
             df_sample = df_sample.drop('id', axis=1)
